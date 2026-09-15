@@ -14,5 +14,11 @@
     "lib": ["ES2022", "DOM"],
     "types": []
   },
-  "include": ["src/data/**/*.ts", "src/domain/**/*.ts", "tests/**/*.ts"]
+  "include": [
+    "src/data/**/*.ts",
+    "src/domain/**/*.ts",
+    "src/features/**/*.ts",
+    "src/shared/**/*.ts",
+    "tests/**/*.ts"
+  ]
 }

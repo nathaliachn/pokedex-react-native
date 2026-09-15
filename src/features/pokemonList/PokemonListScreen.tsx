@@ -24,8 +24,16 @@ export function PokemonListScreen({
   getPokemonList,
   onSelectPokemon,
 }: PokemonListScreenProps) {
-  const { pokemon, isLoading, errorMessage, retry } =
-    usePokemonList(getPokemonList);
+  const {
+    pokemon,
+    isLoading,
+    isLoadingMore,
+    errorMessage,
+    paginationErrorMessage,
+    canLoadMore,
+    retry,
+    loadMore,
+  } = usePokemonList(getPokemonList);
 
   const renderItem: ListRenderItem<Pokemon> = ({ item }) => (
     <PokemonListItem pokemon={item} onPress={onSelectPokemon} />
@@ -37,19 +45,45 @@ export function PokemonListScreen({
         <Text style={styles.title} accessibilityRole="header">
           Pokédex
         </Text>
-        {renderContent(pokemon, isLoading, errorMessage, retry, renderItem)}
+        {renderContent({
+          pokemon,
+          isLoading,
+          isLoadingMore,
+          errorMessage,
+          paginationErrorMessage,
+          canLoadMore,
+          retry,
+          loadMore,
+          renderItem,
+        })}
       </View>
     </SafeAreaView>
   );
 }
 
-function renderContent(
-  pokemon: Pokemon[],
-  isLoading: boolean,
-  errorMessage: string | null,
-  retry: () => void,
-  renderItem: ListRenderItem<Pokemon>,
-) {
+type RenderContentParams = {
+  pokemon: Pokemon[];
+  isLoading: boolean;
+  isLoadingMore: boolean;
+  errorMessage: string | null;
+  paginationErrorMessage: string | null;
+  canLoadMore: boolean;
+  retry: () => void;
+  loadMore: () => void;
+  renderItem: ListRenderItem<Pokemon>;
+};
+
+function renderContent({
+  pokemon,
+  isLoading,
+  isLoadingMore,
+  errorMessage,
+  paginationErrorMessage,
+  canLoadMore,
+  retry,
+  loadMore,
+  renderItem,
+}: RenderContentParams) {
   if (isLoading) {
     return (
       <View style={styles.centered} accessibilityLabel="Loading Pokémon">
@@ -91,9 +125,20 @@ function renderContent(
       renderItem={renderItem}
       ItemSeparatorComponent={ItemSeparator}
       ListEmptyComponent={EmptyState}
+      ListFooterComponent={
+        <ListFooter
+          hasItems={pokemon.length > 0}
+          isLoadingMore={isLoadingMore}
+          paginationErrorMessage={paginationErrorMessage}
+          canLoadMore={canLoadMore}
+          onRetry={loadMore}
+        />
+      }
       contentContainerStyle={
         pokemon.length === 0 ? styles.emptyListContent : styles.listContent
       }
+      onEndReached={loadMore}
+      onEndReachedThreshold={0.6}
       accessibilityLabel="Pokémon list"
     />
   );
@@ -113,6 +158,70 @@ function EmptyState() {
       <Text style={styles.statusText}>No Pokémon to display yet.</Text>
     </View>
   );
+}
+
+type ListFooterProps = {
+  hasItems: boolean;
+  isLoadingMore: boolean;
+  paginationErrorMessage: string | null;
+  canLoadMore: boolean;
+  onRetry: () => void;
+};
+
+function ListFooter({
+  hasItems,
+  isLoadingMore,
+  paginationErrorMessage,
+  canLoadMore,
+  onRetry,
+}: ListFooterProps) {
+  if (!hasItems) {
+    return null;
+  }
+
+  if (isLoadingMore) {
+    return (
+      <View
+        style={styles.footer}
+        accessibilityRole="progressbar"
+        accessibilityLabel="Loading more Pokemon"
+      >
+        <ActivityIndicator color="#2a75bb" accessibilityLabel="Loading more Pokemon" />
+        <Text style={styles.footerText}>Loading more Pokemon...</Text>
+      </View>
+    );
+  }
+
+  if (paginationErrorMessage !== null) {
+    return (
+      <View style={styles.footer} accessibilityLabel={paginationErrorMessage}>
+        <Text style={styles.footerText}>{paginationErrorMessage}</Text>
+        <Pressable
+          onPress={onRetry}
+          style={({ pressed }) => [
+            styles.retryButton,
+            pressed && styles.retryButtonPressed,
+          ]}
+          android_ripple={{ color: 'rgba(255, 255, 255, 0.24)' }}
+          accessibilityRole="button"
+          accessibilityLabel="Retry loading more Pokemon"
+          accessibilityHint="Loads the next Pokemon page again"
+        >
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  if (!canLoadMore) {
+    return (
+      <View style={styles.footer} accessibilityLabel="All Pokemon loaded">
+        <Text style={styles.footerText}>All Pokemon loaded.</Text>
+      </View>
+    );
+  }
+
+  return null;
 }
 
 const styles = StyleSheet.create({
@@ -139,6 +248,20 @@ const styles = StyleSheet.create({
   emptyListContent: {
     flexGrow: 1,
     paddingBottom: 24,
+  },
+  footer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    minHeight: 72,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+  },
+  footerText: {
+    fontSize: 14,
+    color: '#4a5560',
+    textAlign: 'center',
+    flexShrink: 1,
   },
   separator: {
     height: StyleSheet.hairlineWidth,

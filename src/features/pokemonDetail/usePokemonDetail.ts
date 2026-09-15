@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { PokemonDetail } from '../../domain/models/PokemonDetail';
 import { GetPokemonDetail } from '../../domain/useCases/GetPokemonDetail';
+import { APP_ERROR_MESSAGES } from '../../shared/appErrors';
 
 export type PokemonDetailViewState = {
   detail: PokemonDetail | null;
@@ -8,9 +9,6 @@ export type PokemonDetailViewState = {
   errorMessage: string | null;
   retry: () => void;
 };
-
-const FRIENDLY_ERROR_MESSAGE =
-  "We couldn't load this Pokémon right now. Please try again.";
 
 export function usePokemonDetail(
   pokemonId: number,
@@ -46,7 +44,7 @@ export function usePokemonDetail(
         }
 
         setDetail(null);
-        setErrorMessage(FRIENDLY_ERROR_MESSAGE);
+        setErrorMessage(APP_ERROR_MESSAGES.pokemonDetail);
       } finally {
         if (isCurrentRequest) {
           setIsLoading(false);
