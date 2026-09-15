@@ -17,11 +17,19 @@ import { usePokemonList } from './usePokemonList';
 
 type PokemonListScreenProps = {
   getPokemonList: GetPokemonList;
+  onSelectPokemon: (pokemonId: number) => void;
 };
 
-export function PokemonListScreen({ getPokemonList }: PokemonListScreenProps) {
+export function PokemonListScreen({
+  getPokemonList,
+  onSelectPokemon,
+}: PokemonListScreenProps) {
   const { pokemon, isLoading, errorMessage, retry } =
     usePokemonList(getPokemonList);
+
+  const renderItem: ListRenderItem<Pokemon> = ({ item }) => (
+    <PokemonListItem pokemon={item} onPress={onSelectPokemon} />
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -29,7 +37,7 @@ export function PokemonListScreen({ getPokemonList }: PokemonListScreenProps) {
         <Text style={styles.title} accessibilityRole="header">
           Pokédex
         </Text>
-        {renderContent(pokemon, isLoading, errorMessage, retry)}
+        {renderContent(pokemon, isLoading, errorMessage, retry, renderItem)}
       </View>
     </SafeAreaView>
   );
@@ -40,6 +48,7 @@ function renderContent(
   isLoading: boolean,
   errorMessage: string | null,
   retry: () => void,
+  renderItem: ListRenderItem<Pokemon>,
 ) {
   if (isLoading) {
     return (
@@ -60,9 +69,14 @@ function renderContent(
         <Text style={styles.statusText}>{errorMessage}</Text>
         <Pressable
           onPress={retry}
-          style={styles.retryButton}
+          style={({ pressed }) => [
+            styles.retryButton,
+            pressed && styles.retryButtonPressed,
+          ]}
+          android_ripple={{ color: 'rgba(255, 255, 255, 0.24)' }}
           accessibilityRole="button"
-          accessibilityLabel="Retry loading Pokémon"
+          accessibilityLabel="Retry"
+          accessibilityHint="Loads the Pokémon list again"
         >
           <Text style={styles.retryButtonText}>Retry</Text>
         </Pressable>
@@ -88,10 +102,6 @@ function renderContent(
 function keyExtractor(item: Pokemon): string {
   return String(item.id);
 }
-
-const renderItem: ListRenderItem<Pokemon> = ({ item }) => (
-  <PokemonListItem pokemon={item} />
-);
 
 function ItemSeparator() {
   return <View style={styles.separator} />;
@@ -121,6 +131,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 8,
+    flexShrink: 1,
   },
   listContent: {
     paddingBottom: 24,
@@ -145,18 +156,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#4a5560',
     textAlign: 'center',
+    flexShrink: 1,
   },
   retryButton: {
     backgroundColor: '#2a75bb',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,
-    minWidth: 120,
+    minWidth: 48,
+    minHeight: 48,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  retryButtonPressed: {
+    opacity: 0.72,
   },
   retryButtonText: {
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
+    textAlign: 'center',
   },
 });

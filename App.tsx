@@ -1,11 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
-import { getPokemonList } from './src/features/pokemonList/composition';
-import { PokemonListScreen } from './src/features/pokemonList/PokemonListScreen';
+import { AppNavigator } from './src/navigation/AppNavigator';
 
 export default function App() {
   return (
     <>
-      <PokemonListScreen getPokemonList={getPokemonList} />
+      <AppNavigator />
       <StatusBar style="auto" />
     </>
   );

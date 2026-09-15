@@ -1,19 +1,24 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text } from 'react-native';
 import { Pokemon } from '../../domain/models/Pokemon';
 
 type PokemonListItemProps = {
   pokemon: Pokemon;
+  onPress: (pokemonId: number) => void;
 };
 
-export function PokemonListItem({ pokemon }: PokemonListItemProps) {
+export function PokemonListItem({ pokemon, onPress }: PokemonListItemProps) {
   const displayName = formatPokemonName(pokemon.name);
 
   return (
-    <View
-      style={styles.row}
-      accessible
-      accessibilityRole="text"
+    <Pressable
+      onPress={() => {
+        onPress(pokemon.id);
+      }}
+      style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+      android_ripple={{ color: 'rgba(0, 0, 0, 0.12)' }}
+      accessibilityRole="button"
       accessibilityLabel={`${displayName}, Pokémon number ${pokemon.id}`}
+      accessibilityHint="Shows this Pokémon’s details"
     >
       <Image
         source={{ uri: pokemon.imageUrl }}
@@ -22,7 +27,7 @@ export function PokemonListItem({ pokemon }: PokemonListItemProps) {
         accessible={false}
       />
       <Text style={styles.name}>{displayName}</Text>
-    </View>
+    </Pressable>
   );
 }
 
@@ -41,6 +46,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     gap: 16,
+    minHeight: 48,
+  },
+  pressed: {
+    backgroundColor: 'rgba(42, 117, 187, 0.12)',
   },
   image: {
     width: 72,
@@ -48,6 +57,7 @@ const styles = StyleSheet.create({
   },
   name: {
     flex: 1,
+    flexShrink: 1,
     fontSize: 18,
     fontWeight: '600',
     color: '#1a1a1a',

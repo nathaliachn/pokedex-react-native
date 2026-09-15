@@ -1,0 +1,18 @@
+// Compile domain/data tests, then run them with Node's test runner:
+// npm test
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": false,
+    "rootDir": ".",
+    "outDir": "dist-test",
+    "module": "commonjs",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "types": []
+  },
+  "include": ["src/data/**/*.ts", "src/domain/**/*.ts", "tests/**/*.ts"]
+}

@@ -1,8 +1,10 @@
+import { PokemonDetail } from '../../domain/models/PokemonDetail';
 import {
   PokemonListPage,
   PokemonListParams,
   PokemonRepository,
 } from '../../domain/repositories/PokemonRepository';
+import { mapPokemonDetailResponse } from '../pokeApi/mapPokemonDetailResponse';
 import { mapPokemonListResponse } from '../pokeApi/mapPokemonListResponse';
 import { PokeApiPokemonDataSource } from '../pokeApi/PokeApiPokemonDataSource';
 
@@ -12,5 +14,10 @@ export class PokeApiPokemonRepository implements PokemonRepository {
   async getList(params: PokemonListParams): Promise<PokemonListPage> {
     const response = await this.dataSource.getPokemonList(params);
     return mapPokemonListResponse(response, params.offset);
+  }
+
+  async getById(id: number): Promise<PokemonDetail> {
+    const response = await this.dataSource.getPokemonById(id);
+    return mapPokemonDetailResponse(response);
   }
 }

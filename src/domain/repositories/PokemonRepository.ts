@@ -1,4 +1,5 @@
 import { Pokemon } from '../models/Pokemon';
+import { PokemonDetail } from '../models/PokemonDetail';
 
 export type PokemonListParams = {
   limit: number;
@@ -12,4 +13,5 @@ export type PokemonListPage = {
 
 export interface PokemonRepository {
   getList(params: PokemonListParams): Promise<PokemonListPage>;
+  getById(id: number): Promise<PokemonDetail>;
 }
