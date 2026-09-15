@@ -3,6 +3,7 @@ import { afterEach, describe, it } from 'node:test';
 import { PokeApiPokemonDataSource } from '../src/data/pokeApi/PokeApiPokemonDataSource';
 import { PokemonDetailResponseDto } from '../src/data/pokeApi/pokemonDetailDto';
 import { PokemonListResponseDto } from '../src/data/pokeApi/pokemonListDto';
+import { NetworkRequestError } from '../src/data/pokeApi/NetworkRequestError';
 
 const originalFetch = globalThis.fetch;
 
@@ -83,9 +84,10 @@ describe('PokeApiPokemonDataSource', () => {
     );
   });
 
-  it('propagates network failures from fetch', async () => {
+  it('classifies network failures and retains their cause', async () => {
+    const cause = new TypeError('Network request failed');
     globalThis.fetch = async (): Promise<Response> => {
-      throw new TypeError('Network request failed');
+      throw cause;
     };
 
     const dataSource = new PokeApiPokemonDataSource();
@@ -93,7 +95,27 @@ describe('PokeApiPokemonDataSource', () => {
     await assert.rejects(
       () => dataSource.getPokemonList({ limit: 20, offset: 0 }),
       (error: unknown) =>
-        error instanceof TypeError && error.message === 'Network request failed',
+        error instanceof NetworkRequestError && error.cause === cause,
+    );
+  });
+
+  it('does not classify invalid JSON as a network failure', async () => {
+    globalThis.fetch = async () => new Response('invalid json');
+    await assert.rejects(
+      () => new PokeApiPokemonDataSource().getPokemonById(1),
+      (error: unknown) => error instanceof SyntaxError,
+    );
+  });
+
+  it('classifies a response body download failure as a network failure', async () => {
+    globalThis.fetch = async () => {
+      const response = new Response();
+      response.json = async () => { throw new TypeError('Connection lost'); };
+      return response;
+    };
+    await assert.rejects(
+      () => new PokeApiPokemonDataSource().getPokemonById(1),
+      (error: unknown) => error instanceof NetworkRequestError,
     );
   });
 });

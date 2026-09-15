@@ -1,6 +1,7 @@
 import { PokemonListParams } from '../../domain/repositories/PokemonRepository';
 import { PokemonDetailResponseDto } from './pokemonDetailDto';
 import { PokemonListResponseDto } from './pokemonListDto';
+import { NetworkRequestError } from './NetworkRequestError';
 
 const POKE_API_BASE_URL = 'https://pokeapi.co/api/v2/pokemon';
 
@@ -18,7 +19,12 @@ export class PokeApiPokemonDataSource {
   }
 
   private async getJson<T>(url: string): Promise<T> {
-    const response = await fetch(url);
+    let response: Response;
+    try {
+      response = await fetch(url);
+    } catch (cause: unknown) {
+      throw new NetworkRequestError(cause);
+    }
 
     if (!response.ok) {
       throw new Error(
@@ -26,6 +32,14 @@ export class PokeApiPokemonDataSource {
       );
     }
 
-    return (await response.json()) as T;
+    try {
+      return (await response.json()) as T;
+    } catch (cause: unknown) {
+      // A response body can fail to download after headers have arrived.
+      if (cause instanceof TypeError) {
+        throw new NetworkRequestError(cause);
+      }
+      throw cause;
+    }
   }
 }
