@@ -8,6 +8,7 @@ export type PokemonListParams = {
 
 export type PokemonListPage = {
   items: Pokemon[];
+  totalCount: number;
   nextOffset: number | null;
 };
 

@@ -31,6 +31,7 @@ const detail: PokemonDetail = {
 };
 const page: PokemonListPage = {
   items: [{ id: detail.id, name: detail.name, imageUrl: detail.imageUrl }],
+  totalCount: 1350,
   nextOffset: 20,
 };
 const networkError = new NetworkRequestError(new TypeError('Offline'));
@@ -93,7 +94,7 @@ describe('Persistent Pokemon repository', () => {
     const { repository, storage, remote } = setup();
     await repository.getList(params);
     await repository.getById(1);
-    remote.page = { items: [], nextOffset: null };
+    remote.page = { items: [], totalCount: 1350, nextOffset: null };
     remote.detail = { ...detail, name: 'updated' };
     storage.failWrite = true;
     assert.deepEqual(await repository.getList(params), remote.page);
@@ -103,7 +104,7 @@ describe('Persistent Pokemon repository', () => {
   it('refreshes persisted data after a successful subsequent response', async () => {
     const { repository, remote, cache } = setup();
     await repository.getList(params);
-    remote.page = { items: [], nextOffset: null };
+    remote.page = { items: [], totalCount: 1350, nextOffset: null };
     await repository.getList(params);
     assert.deepEqual(await cache.readList(params), remote.page);
   });
@@ -132,6 +133,7 @@ describe('Persistent Pokemon repository', () => {
     await repository.getList(params);
     remote.page = {
       items: [...page.items, { id: 2, name: 'ivysaur', imageUrl: 'https://example.com/2.png' }],
+      totalCount: 1350,
       nextOffset: null,
     };
     await repository.getList({ limit: 20, offset: 20 });

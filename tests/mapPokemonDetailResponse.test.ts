@@ -58,4 +58,15 @@ describe('mapPokemonDetailResponse', () => {
     assert.equal(detail.id, 1);
     assert.equal(detail.name, 'bulbasaur');
   });
+
+  it('prefers official artwork and falls back to the sprite when unavailable', () => {
+    const base: PokemonDetailResponseDto = {
+      id: 25, name: 'pikachu', height: 4, weight: 60, types: [], abilities: [], stats: [],
+      sprites: { front_default: 'https://example.com/sprite.png', other: {
+        'official-artwork': { front_default: 'https://example.com/artwork.png' },
+      } },
+    };
+    assert.equal(mapPokemonDetailResponse(base).imageUrl, 'https://example.com/artwork.png');
+    assert.equal(mapPokemonDetailResponse({ ...base, sprites: { front_default: 'https://example.com/sprite.png' } }).imageUrl, 'https://example.com/sprite.png');
+  });
 });

@@ -26,7 +26,10 @@ export function mapPokemonDetailResponse(
   return {
     id: response.id,
     name: response.name,
-    imageUrl: `${SPRITE_BASE_URL}/${response.id}.png`,
+    imageUrl:
+      response.sprites?.other?.['official-artwork']?.front_default ??
+      response.sprites?.front_default ??
+      `${SPRITE_BASE_URL}/${response.id}.png`,
     types,
     abilities,
     stats,

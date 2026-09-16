@@ -6,12 +6,15 @@ import { appendUniquePokemon, POKEMON_LIST_PAGE_SIZE } from './listPagination';
 
 export type PokemonListViewState = {
   pokemon: Pokemon[];
+  totalCount: number | null;
   isLoading: boolean;
+  isRefreshing: boolean;
   isLoadingMore: boolean;
   errorMessage: string | null;
   paginationErrorMessage: string | null;
   canLoadMore: boolean;
   retry: () => void;
+  refresh: () => void;
   loadMore: () => void;
 };
 
@@ -19,7 +22,9 @@ export function usePokemonList(
   getPokemonList: GetPokemonList,
 ): PokemonListViewState {
   const [pokemon, setPokemon] = useState<Pokemon[]>([]);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [paginationErrorMessage, setPaginationErrorMessage] = useState<
@@ -27,11 +32,16 @@ export function usePokemonList(
   >(null);
   const [nextOffset, setNextOffset] = useState<number | null>(null);
   const [reloadToken, setReloadToken] = useState<number>(0);
+  const [refreshToken, setRefreshToken] = useState<number>(0);
   const isLoadingMoreRef = useRef<boolean>(false);
   const isMountedRef = useRef<boolean>(true);
 
   const retry = useCallback(() => {
     setReloadToken((currentToken) => currentToken + 1);
+  }, []);
+
+  const refresh = useCallback(() => {
+    setRefreshToken((currentToken) => currentToken + 1);
   }, []);
 
   const loadMore = useCallback(() => {
@@ -83,7 +93,9 @@ export function usePokemonList(
     isMountedRef.current = true;
 
     const loadPokemon = async (): Promise<void> => {
-      setIsLoading(true);
+      const refreshing = refreshToken > 0;
+      setIsLoading(!refreshing);
+      setIsRefreshing(refreshing);
       setErrorMessage(null);
       setPaginationErrorMessage(null);
 
@@ -97,19 +109,21 @@ export function usePokemonList(
           return;
         }
 
-        setPokemon(page.items);
+          setPokemon(page.items);
+        setTotalCount(page.totalCount);
         setNextOffset(page.nextOffset);
       } catch {
         if (!isMountedRef.current) {
           return;
         }
 
-        setPokemon([]);
+          if (!refreshing) setPokemon([]);
         setNextOffset(null);
         setErrorMessage(APP_ERROR_MESSAGES.pokemonList);
       } finally {
         if (isMountedRef.current) {
           setIsLoading(false);
+          setIsRefreshing(false);
         }
       }
     };
@@ -119,16 +133,19 @@ export function usePokemonList(
     return () => {
       isMountedRef.current = false;
     };
-  }, [getPokemonList, reloadToken]);
+  }, [getPokemonList, refreshToken, reloadToken]);
 
   return {
     pokemon,
+    totalCount,
     isLoading,
+    isRefreshing,
     isLoadingMore,
     errorMessage,
     paginationErrorMessage,
     canLoadMore: nextOffset !== null,
     retry,
+    refresh,
     loadMore,
   };
 }

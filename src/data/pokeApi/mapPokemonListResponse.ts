@@ -14,6 +14,7 @@ export function mapPokemonListResponse(
 ): PokemonListPage {
   return {
     items: response.results.map(mapPokemonListItem),
+    totalCount: response.count,
     nextOffset: response.next === null ? null : offset + response.results.length,
   };
 }

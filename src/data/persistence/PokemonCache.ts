@@ -8,7 +8,7 @@ export class PokemonCache {
 
   readList(params: PokemonListParams): Promise<PokemonListPage | null> {
     return this.read(this.listKey(params), (value): value is PokemonListPage =>
-      isRecord(value) && Array.isArray(value.items) && value.items.every(isPokemon) &&
+      isRecord(value) && isInteger(value.totalCount) && Array.isArray(value.items) && value.items.every(isPokemon) &&
       (value.nextOffset === null ||
         (isInteger(value.nextOffset) && value.nextOffset > params.offset)),
     );

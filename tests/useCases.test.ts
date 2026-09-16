@@ -17,7 +17,7 @@ class RecordingPokemonRepository implements PokemonRepository {
   async getList(params: PokemonListParams): Promise<PokemonListPage> {
     this.listCalls.push(params);
     const items: Pokemon[] = [];
-    return { items, nextOffset: null };
+    return { items, totalCount: 0, nextOffset: null };
   }
 
   async getById(id: number): Promise<PokemonDetail> {

@@ -28,4 +28,12 @@ export type PokemonDetailResponseDto = {
   types: PokemonTypeSlotDto[];
   abilities: PokemonAbilitySlotDto[];
   stats: PokemonStatDto[];
+  sprites?: {
+    front_default?: string | null;
+    other?: {
+      'official-artwork'?: {
+        front_default?: string | null;
+      };
+    };
+  };
 };

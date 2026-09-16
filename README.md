@@ -80,3 +80,38 @@ durability or simulate an actual process restart.
 - In Expo Go, ensure the JS bundle can load before testing offline; a cold launch that
   needs Metro is separate from Pokémon data persistence. Use an installed build for
   a fully offline process-restart check.
+
+## UI, accessibility, and platform limits
+
+Screens share a constrained reading width, scalable text, native loading feedback,
+48-point minimum action targets, and explicit Retry/Back labels. Loading feedback
+exposes a busy state; Android status messages use polite live regions. Decorative
+images and chevrons are excluded from screen-reader focus. Detail measurements and
+stats group their labels with values. Type badges include their text labels and use
+contrast-safe accents; stat bars use a bounded 0–255 scale while retaining numeric
+values. Stat bars use a visual 0–150 scale and clamp only the bar, while accessibility
+retains the exact numeric value. The list supports native pull-to-refresh for a first-page network refresh,
+separate from initial and pagination loading. Error/loading screens scroll at large font sizes;
+the list remains a FlatList with stable ID keys and memoized rows. Automatic end-of-list
+requests pause after a pagination error until the user presses Retry.
+
+List search is local and limited to already-loaded names and numbers; it never starts
+network requests, and the API total remains visible while results are filtered. List
+cards stay neutral because the list endpoint does not provide types and enriching every
+row would require one detail request per Pokémon. Detail content uses an About/Stats
+segmented control so the artwork/profile and stat visualization do not create one long
+scrolling page.
+
+React Native 0.86's public core SafeAreaView is deprecated and only protects iOS.
+The app uses Expo SDK 57's compatible `react-native-safe-area-context` provider and
+native SafeAreaView to apply dynamic top and bottom insets on iOS and Android,
+including gesture and three-button navigation. The deprecated core component and
+manual status-bar padding are no longer used.
+
+UI checks remain manual: test VoiceOver/TalkBack reading order and Retry/Back actions,
+maximum text/display size, smallest supported screen and tablet width, light/dark
+system settings (the app remains light), and all loading/error/empty/footer states.
+Check iOS notches/home indicators and Android gesture **and** three-button navigation,
+especially the last list row, pagination Retry, and final detail stats. Existing
+hardware Back behavior is preserved. Automated tests do not validate native layout,
+screen-reader announcements, or full Apple HIG/Material compliance.

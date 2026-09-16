@@ -38,6 +38,7 @@ describe('mapPokemonListResponse', () => {
         imageUrl: `${SPRITE_BASE_URL}/2.png`,
       },
     ]);
+    assert.equal(page.totalCount, 2);
   });
 
   it('computes nextOffset from the request offset when another page exists', () => {
@@ -92,6 +93,7 @@ describe('mapPokemonListResponse', () => {
 
     assert.deepEqual(page, {
       items: [],
+      totalCount: 0,
       nextOffset: null,
     });
   });

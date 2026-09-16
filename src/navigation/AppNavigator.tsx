@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { BackHandler, StyleSheet, View } from 'react-native';
 import { getPokemonDetail, getPokemonList } from '../composition';
 import { PokemonDetailScreen } from '../features/pokemonDetail/PokemonDetailScreen';
@@ -8,6 +8,9 @@ import { AppRoute } from './AppRoute';
 export function AppNavigator(): ReactElement {
   const [route, setRoute] = useState<AppRoute>({ name: 'list' });
   const isListVisible = route.name === 'list';
+  const selectPokemon = useCallback((pokemonId: number) => {
+    setRoute({ name: 'detail', pokemonId });
+  }, []);
 
   useEffect(() => {
     const subscription = BackHandler.addEventListener(
@@ -40,9 +43,7 @@ export function AppNavigator(): ReactElement {
       >
         <PokemonListScreen
           getPokemonList={getPokemonList}
-          onSelectPokemon={(pokemonId) => {
-            setRoute({ name: 'detail', pokemonId });
-          }}
+          onSelectPokemon={selectPokemon}
         />
       </View>
       {route.name === 'detail' ? (
@@ -63,6 +64,7 @@ export function AppNavigator(): ReactElement {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    backgroundColor: '#f4f6f8',
   },
   listLayer: {
     flex: 1,
