@@ -25,9 +25,14 @@ class RecordingStorage implements TextStorage {
 
 const params = { limit: 20, offset: 0 };
 const detail: PokemonDetail = {
-  id: 1, name: 'bulbasaur', imageUrl: 'https://example.com/1.png',
-  types: ['grass'], abilities: ['overgrow'], stats: [{ name: 'hp', value: 45 }],
-  height: 0.7, weight: 6.9,
+  id: 1,
+  name: 'bulbasaur',
+  imageUrl: 'https://example.com/1.png',
+  types: ['grass'],
+  abilities: ['overgrow'],
+  stats: [{ name: 'hp', value: 45 }],
+  height: 0.7,
+  weight: 6.9,
 };
 const page: PokemonListPage = {
   items: [{ id: detail.id, name: detail.name, imageUrl: detail.imageUrl }],
@@ -83,11 +88,23 @@ describe('Persistent Pokemon repository', () => {
     assert.deepEqual(await recreated.getById(1), detail);
   });
 
+  it('persists name lookups under the returned id for offline detail reuse', async () => {
+    const { repository, cache } = setup();
+    await repository.getById('bulbasaur');
+    assert.deepEqual(await cache.readDetail(1), detail);
+  });
+
   it('preserves the original network error for uncached lists and details', async () => {
     const { repository, remote } = setup();
     remote.error = networkError;
-    await assert.rejects(() => repository.getList(params), (e) => e === networkError);
-    await assert.rejects(() => repository.getById(1), (e) => e === networkError);
+    await assert.rejects(
+      () => repository.getList(params),
+      (e) => e === networkError,
+    );
+    await assert.rejects(
+      () => repository.getById(1),
+      (e) => e === networkError,
+    );
   });
 
   it('returns fresh list/detail data even when writes fail and stale data exists', async () => {
@@ -113,8 +130,14 @@ describe('Persistent Pokemon repository', () => {
     const { repository, storage, remote } = setup();
     remote.error = networkError;
     storage.failRead = true;
-    await assert.rejects(() => repository.getList(params), (e) => e === networkError);
-    await assert.rejects(() => repository.getById(1), (e) => e === networkError);
+    await assert.rejects(
+      () => repository.getList(params),
+      (e) => e === networkError,
+    );
+    await assert.rejects(
+      () => repository.getById(1),
+      (e) => e === networkError,
+    );
   });
 
   it('does not hide HTTP or mapping errors behind cached data', async () => {
@@ -123,8 +146,14 @@ describe('Persistent Pokemon repository', () => {
     await repository.getById(1);
     for (const error of [new Error('HTTP 404'), new SyntaxError('Invalid response')]) {
       remote.error = error;
-      await assert.rejects(() => repository.getList(params), (e) => e === error);
-      await assert.rejects(() => repository.getById(1), (e) => e === error);
+      await assert.rejects(
+        () => repository.getList(params),
+        (e) => e === error,
+      );
+      await assert.rejects(
+        () => repository.getById(1),
+        (e) => e === error,
+      );
     }
   });
 
@@ -142,24 +171,51 @@ describe('Persistent Pokemon repository', () => {
     const second = await repository.getList({ limit: 20, offset: 20 });
     assert.equal(first.nextOffset, 20);
     assert.equal(second.nextOffset, null);
-    assert.deepEqual(appendUniquePokemon(first.items, second.items).map((p) => p.id), [1, 2]);
-    await assert.rejects(() => repository.getList({ limit: 10, offset: 0 }), (e) => e === networkError);
-    await assert.rejects(() => repository.getList({ limit: 20, offset: 40 }), (e) => e === networkError);
-    await assert.rejects(() => repository.getById(2), (e) => e === networkError);
+    assert.deepEqual(
+      appendUniquePokemon(first.items, second.items).map((p) => p.id),
+      [1, 2],
+    );
+    await assert.rejects(
+      () => repository.getList({ limit: 10, offset: 0 }),
+      (e) => e === networkError,
+    );
+    await assert.rejects(
+      () => repository.getList({ limit: 20, offset: 40 }),
+      (e) => e === networkError,
+    );
+    await assert.rejects(
+      () => repository.getById(2),
+      (e) => e === networkError,
+    );
   });
 
   it('treats invalid JSON, invalid shapes and non-advancing offsets as cache misses', async () => {
     const { repository, storage, remote } = setup();
     remote.error = networkError;
-    for (const invalid of ['{', 'null', '{}', JSON.stringify({ ...page, nextOffset: 0 }),
-      JSON.stringify({ items: [{ id: 1 }], nextOffset: null })]) {
+    for (const invalid of [
+      '{',
+      'null',
+      '{}',
+      JSON.stringify({ ...page, nextOffset: 0 }),
+      JSON.stringify({ items: [{ id: 1 }], nextOffset: null }),
+    ]) {
       storage.files.set('list-20-0', invalid);
-      await assert.rejects(() => repository.getList(params), (e) => e === networkError);
+      await assert.rejects(
+        () => repository.getList(params),
+        (e) => e === networkError,
+      );
     }
-    for (const invalid of ['{', '{}', JSON.stringify({ ...detail, id: 2 }),
-      JSON.stringify({ ...detail, stats: [null] })]) {
+    for (const invalid of [
+      '{',
+      '{}',
+      JSON.stringify({ ...detail, id: 2 }),
+      JSON.stringify({ ...detail, stats: [null] }),
+    ]) {
       storage.files.set('detail-1', invalid);
-      await assert.rejects(() => repository.getById(1), (e) => e === networkError);
+      await assert.rejects(
+        () => repository.getById(1),
+        (e) => e === networkError,
+      );
     }
   });
 });

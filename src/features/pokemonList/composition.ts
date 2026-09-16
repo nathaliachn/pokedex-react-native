@@ -1,1 +1,1 @@
-export { createPokemonUseCases, getPokemonList } from '../../composition';
+export { createPokemonUseCases, getPokemonDetail, getPokemonList } from '../../composition';

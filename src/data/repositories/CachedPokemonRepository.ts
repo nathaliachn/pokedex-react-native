@@ -1,5 +1,10 @@
 import { PokemonDetail } from '../../domain/models/PokemonDetail';
-import { PokemonListPage, PokemonListParams, PokemonRepository } from '../../domain/repositories/PokemonRepository';
+import {
+  PokemonListPage,
+  PokemonListParams,
+  PokemonIdentifier,
+  PokemonRepository,
+} from '../../domain/repositories/PokemonRepository';
 import { PokemonCache } from '../persistence/PokemonCache';
 import { NetworkRequestError } from '../pokeApi/NetworkRequestError';
 
@@ -18,11 +23,11 @@ export class CachedPokemonRepository implements PokemonRepository {
     );
   }
 
-  getById(id: number): Promise<PokemonDetail> {
+  getById(identifier: PokemonIdentifier): Promise<PokemonDetail> {
     return this.request(
-      () => this.remote.getById(id),
-      () => this.cache.readDetail(id),
-      (detail) => this.cache.writeDetail(id, detail),
+      () => this.remote.getById(identifier),
+      () => this.cache.readDetail(identifier),
+      (detail) => this.cache.writeDetail(identifier, detail),
     );
   }
 

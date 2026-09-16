@@ -1,16 +1,25 @@
 import { Pokemon } from '../../domain/models/Pokemon';
 import { PokemonDetail } from '../../domain/models/PokemonDetail';
-import { PokemonListPage, PokemonListParams } from '../../domain/repositories/PokemonRepository';
+import {
+  PokemonIdentifier,
+  PokemonListPage,
+  PokemonListParams,
+} from '../../domain/repositories/PokemonRepository';
 import { TextStorage } from './TextStorage';
 
 export class PokemonCache {
   constructor(private readonly storage: TextStorage) {}
 
   readList(params: PokemonListParams): Promise<PokemonListPage | null> {
-    return this.read(this.listKey(params), (value): value is PokemonListPage =>
-      isRecord(value) && isInteger(value.totalCount) && Array.isArray(value.items) && value.items.every(isPokemon) &&
-      (value.nextOffset === null ||
-        (isInteger(value.nextOffset) && value.nextOffset > params.offset)),
+    return this.read(
+      this.listKey(params),
+      (value): value is PokemonListPage =>
+        isRecord(value) &&
+        isInteger(value.totalCount) &&
+        Array.isArray(value.items) &&
+        value.items.every(isPokemon) &&
+        (value.nextOffset === null ||
+          (isInteger(value.nextOffset) && value.nextOffset > params.offset)),
     );
   }
 
@@ -18,14 +27,21 @@ export class PokemonCache {
     return this.storage.write(this.listKey(params), JSON.stringify(page));
   }
 
-  readDetail(id: number): Promise<PokemonDetail | null> {
-    return this.read(`detail-${id}`, (value): value is PokemonDetail =>
-      isDetail(value) && value.id === id,
+  readDetail(identifier: PokemonIdentifier): Promise<PokemonDetail | null> {
+    return this.read(
+      `detail-${identifier}`,
+      (value): value is PokemonDetail =>
+        isDetail(value) && (typeof identifier === 'string' || value.id === identifier),
     );
   }
 
-  writeDetail(id: number, detail: PokemonDetail): Promise<void> {
-    return this.storage.write(`detail-${id}`, JSON.stringify(detail));
+  writeDetail(identifier: PokemonIdentifier, detail: PokemonDetail): Promise<void> {
+    const serialized = JSON.stringify(detail);
+    const writes = [this.storage.write(`detail-${identifier}`, serialized)];
+    if (typeof identifier === 'string') {
+      writes.push(this.storage.write(`detail-${detail.id}`, serialized));
+    }
+    return Promise.all(writes).then(() => undefined);
   }
 
   private listKey({ limit, offset }: PokemonListParams): string {
@@ -49,8 +65,13 @@ function isInteger(value: unknown): value is number {
 }
 
 function isPokemon(value: unknown): value is Pokemon & Record<string, unknown> {
-  return isRecord(value) && isInteger(value.id) && value.id > 0 &&
-    typeof value.name === 'string' && typeof value.imageUrl === 'string';
+  return (
+    isRecord(value) &&
+    isInteger(value.id) &&
+    value.id > 0 &&
+    typeof value.name === 'string' &&
+    typeof value.imageUrl === 'string'
+  );
 }
 
 function isStrings(value: unknown): value is string[] {
@@ -58,12 +79,22 @@ function isStrings(value: unknown): value is string[] {
 }
 
 function isDetail(value: unknown): value is PokemonDetail {
-  return isRecord(value) && isPokemon(value) &&
-    isStrings(value.types) && isStrings(value.abilities) &&
-    typeof value.height === 'number' && Number.isFinite(value.height) &&
-    typeof value.weight === 'number' && Number.isFinite(value.weight) &&
-    Array.isArray(value.stats) && value.stats.every((stat: unknown) =>
-      isRecord(stat) && typeof stat.name === 'string' &&
-      typeof stat.value === 'number' && Number.isFinite(stat.value),
-    );
+  return (
+    isRecord(value) &&
+    isPokemon(value) &&
+    isStrings(value.types) &&
+    isStrings(value.abilities) &&
+    typeof value.height === 'number' &&
+    Number.isFinite(value.height) &&
+    typeof value.weight === 'number' &&
+    Number.isFinite(value.weight) &&
+    Array.isArray(value.stats) &&
+    value.stats.every(
+      (stat: unknown) =>
+        isRecord(stat) &&
+        typeof stat.name === 'string' &&
+        typeof stat.value === 'number' &&
+        Number.isFinite(stat.value),
+    )
+  );
 }

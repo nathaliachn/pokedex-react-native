@@ -37,10 +37,7 @@ describe('PokeApiPokemonDataSource', () => {
     const dataSource = new PokeApiPokemonDataSource();
     const result = await dataSource.getPokemonList({ limit: 20, offset: 0 });
 
-    assert.equal(
-      requestedUrl,
-      'https://pokeapi.co/api/v2/pokemon?limit=20&offset=0',
-    );
+    assert.equal(requestedUrl, 'https://pokeapi.co/api/v2/pokemon?limit=20&offset=0');
     assert.deepEqual(result, payload);
   });
 
@@ -71,6 +68,25 @@ describe('PokeApiPokemonDataSource', () => {
     assert.deepEqual(result, payload);
   });
 
+  it('requests a Pokémon by encoded name', async () => {
+    const payload: PokemonDetailResponseDto = {
+      id: 700,
+      name: 'sylveon',
+      height: 10,
+      weight: 235,
+      types: [],
+      abilities: [],
+      stats: [],
+    };
+    let requestedUrl = '';
+    globalThis.fetch = async (input: RequestInfo | URL): Promise<Response> => {
+      requestedUrl = String(input);
+      return new Response(JSON.stringify(payload), { status: 200 });
+    };
+    await new PokeApiPokemonDataSource().getPokemonById('sylveon');
+    assert.equal(requestedUrl, 'https://pokeapi.co/api/v2/pokemon/sylveon');
+  });
+
   it('throws when the HTTP response is not successful', async () => {
     globalThis.fetch = async (): Promise<Response> => {
       return new Response('Not Found', { status: 404 });
@@ -94,8 +110,7 @@ describe('PokeApiPokemonDataSource', () => {
 
     await assert.rejects(
       () => dataSource.getPokemonList({ limit: 20, offset: 0 }),
-      (error: unknown) =>
-        error instanceof NetworkRequestError && error.cause === cause,
+      (error: unknown) => error instanceof NetworkRequestError && error.cause === cause,
     );
   });
 
@@ -110,7 +125,9 @@ describe('PokeApiPokemonDataSource', () => {
   it('classifies a response body download failure as a network failure', async () => {
     globalThis.fetch = async () => {
       const response = new Response();
-      response.json = async () => { throw new TypeError('Connection lost'); };
+      response.json = async () => {
+        throw new TypeError('Connection lost');
+      };
       return response;
     };
     await assert.rejects(

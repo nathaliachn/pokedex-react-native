@@ -1,3 +1,1 @@
-export type AppRoute =
-  | { name: 'list' }
-  | { name: 'detail'; pokemonId: number };
+export type AppRoute = { name: 'list' } | { name: 'detail'; pokemonId: number };

@@ -2,6 +2,7 @@ import { PokemonDetail } from '../../domain/models/PokemonDetail';
 import {
   PokemonListPage,
   PokemonListParams,
+  PokemonIdentifier,
   PokemonRepository,
 } from '../../domain/repositories/PokemonRepository';
 import { mapPokemonDetailResponse } from '../pokeApi/mapPokemonDetailResponse';
@@ -16,8 +17,8 @@ export class PokeApiPokemonRepository implements PokemonRepository {
     return mapPokemonListResponse(response, params.offset);
   }
 
-  async getById(id: number): Promise<PokemonDetail> {
-    const response = await this.dataSource.getPokemonById(id);
+  async getById(identifier: PokemonIdentifier): Promise<PokemonDetail> {
+    const response = await this.dataSource.getPokemonById(identifier);
     return mapPokemonDetailResponse(response);
   }
 }

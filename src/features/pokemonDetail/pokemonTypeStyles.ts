@@ -1,13 +1,49 @@
 export type PokemonType =
-  | 'bug' | 'dark' | 'dragon' | 'electric' | 'fairy' | 'fighting' | 'fire'
-  | 'flying' | 'ghost' | 'grass' | 'ground' | 'ice' | 'normal' | 'poison'
-  | 'psychic' | 'rock' | 'steel' | 'water';
+  | 'bug'
+  | 'dark'
+  | 'dragon'
+  | 'electric'
+  | 'fairy'
+  | 'fighting'
+  | 'fire'
+  | 'flying'
+  | 'ghost'
+  | 'grass'
+  | 'ground'
+  | 'ice'
+  | 'normal'
+  | 'poison'
+  | 'psychic'
+  | 'rock'
+  | 'steel'
+  | 'water';
 
 type TypeStyle = { backgroundColor: string; textColor: string };
 
 const DEFAULT_TYPE_STYLE: TypeStyle = {
   backgroundColor: '#536578',
   textColor: '#ffffff',
+};
+
+export const POKEMON_TYPE_LABELS: Readonly<Record<PokemonType, string>> = {
+  normal: 'Normal',
+  fire: 'Fuego',
+  water: 'Agua',
+  electric: 'Eléctrico',
+  grass: 'Planta',
+  ice: 'Hielo',
+  fighting: 'Lucha',
+  poison: 'Veneno',
+  ground: 'Tierra',
+  flying: 'Volador',
+  psychic: 'Psíquico',
+  bug: 'Bicho',
+  rock: 'Roca',
+  ghost: 'Fantasma',
+  dragon: 'Dragón',
+  dark: 'Siniestro',
+  steel: 'Acero',
+  fairy: 'Hada',
 };
 
 export const POKEMON_TYPE_STYLES: Readonly<Record<PokemonType, TypeStyle>> = {
@@ -33,4 +69,8 @@ export const POKEMON_TYPE_STYLES: Readonly<Record<PokemonType, TypeStyle>> = {
 
 export function getPokemonTypeStyle(type: string): TypeStyle {
   return POKEMON_TYPE_STYLES[type as PokemonType] ?? DEFAULT_TYPE_STYLE;
+}
+
+export function getPokemonTypeLabel(type: string): string {
+  return POKEMON_TYPE_LABELS[type as PokemonType] ?? type;
 }

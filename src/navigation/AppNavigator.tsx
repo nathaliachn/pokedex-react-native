@@ -13,17 +13,14 @@ export function AppNavigator(): ReactElement {
   }, []);
 
   useEffect(() => {
-    const subscription = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        if (route.name !== 'detail') {
-          return false;
-        }
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (route.name !== 'detail') {
+        return false;
+      }
 
-        setRoute({ name: 'list' });
-        return true;
-      },
-    );
+      setRoute({ name: 'list' });
+      return true;
+    });
 
     return () => {
       subscription.remove();
@@ -37,18 +34,18 @@ export function AppNavigator(): ReactElement {
         collapsable={false}
         pointerEvents={isListVisible ? 'auto' : 'none'}
         accessibilityElementsHidden={!isListVisible}
-        importantForAccessibility={
-          isListVisible ? 'auto' : 'no-hide-descendants'
-        }
+        importantForAccessibility={isListVisible ? 'auto' : 'no-hide-descendants'}
       >
         <PokemonListScreen
           getPokemonList={getPokemonList}
+          getPokemonDetail={getPokemonDetail}
           onSelectPokemon={selectPokemon}
         />
       </View>
       {route.name === 'detail' ? (
         <View style={styles.detailLayer} accessibilityViewIsModal>
           <PokemonDetailScreen
+            key={route.pokemonId}
             pokemonId={route.pokemonId}
             getPokemonDetail={getPokemonDetail}
             onBack={() => {

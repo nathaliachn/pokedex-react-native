@@ -1,12 +1,8 @@
 import { Pokemon } from '../../domain/models/Pokemon';
 import { PokemonListPage } from '../../domain/repositories/PokemonRepository';
-import {
-  PokemonListItemDto,
-  PokemonListResponseDto,
-} from './pokemonListDto';
+import { PokemonListItemDto, PokemonListResponseDto } from './pokemonListDto';
 
-const SPRITE_BASE_URL =
-  'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
+const SPRITE_BASE_URL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 
 export function mapPokemonListResponse(
   response: PokemonListResponseDto,

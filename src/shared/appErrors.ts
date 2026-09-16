@@ -1,4 +1,5 @@
 export const APP_ERROR_MESSAGES = {
-  pokemonList: "We couldn't load Pokemon right now. Please try again.",
-  pokemonDetail: "We couldn't load this Pokemon right now. Please try again.",
+  pokemonList: 'No se pudo cargar la lista de Pokémon. Inténtalo de nuevo.',
+  pokemonDetail: 'No se pudo cargar este Pokémon. Inténtalo de nuevo.',
+  pokemonSearch: 'No se pudo buscar ese Pokémon. Inténtalo de nuevo.',
 } as const;

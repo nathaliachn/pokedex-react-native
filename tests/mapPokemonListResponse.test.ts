@@ -3,8 +3,7 @@ import { describe, it } from 'node:test';
 import { mapPokemonListResponse } from '../src/data/pokeApi/mapPokemonListResponse';
 import { PokemonListResponseDto } from '../src/data/pokeApi/pokemonListDto';
 
-const SPRITE_BASE_URL =
-  'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
+const SPRITE_BASE_URL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 
 describe('mapPokemonListResponse', () => {
   it('extracts IDs from the PokéAPI url and builds sprite image URLs', () => {

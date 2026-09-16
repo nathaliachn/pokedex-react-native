@@ -3,9 +3,7 @@ import { describe, it } from 'node:test';
 import { mapPokemonDetailResponse } from '../src/data/pokeApi/mapPokemonDetailResponse';
 import { PokemonDetailResponseDto } from '../src/data/pokeApi/pokemonDetailDto';
 
-function namedResource(
-  name: string,
-): PokemonDetailResponseDto['types'][number]['type'] {
+function namedResource(name: string): PokemonDetailResponseDto['types'][number]['type'] {
   return {
     name,
     url: `https://pokeapi.co/api/v2/${name}/`,
@@ -61,12 +59,27 @@ describe('mapPokemonDetailResponse', () => {
 
   it('prefers official artwork and falls back to the sprite when unavailable', () => {
     const base: PokemonDetailResponseDto = {
-      id: 25, name: 'pikachu', height: 4, weight: 60, types: [], abilities: [], stats: [],
-      sprites: { front_default: 'https://example.com/sprite.png', other: {
-        'official-artwork': { front_default: 'https://example.com/artwork.png' },
-      } },
+      id: 25,
+      name: 'pikachu',
+      height: 4,
+      weight: 60,
+      types: [],
+      abilities: [],
+      stats: [],
+      sprites: {
+        front_default: 'https://example.com/sprite.png',
+        other: {
+          'official-artwork': { front_default: 'https://example.com/artwork.png' },
+        },
+      },
     };
     assert.equal(mapPokemonDetailResponse(base).imageUrl, 'https://example.com/artwork.png');
-    assert.equal(mapPokemonDetailResponse({ ...base, sprites: { front_default: 'https://example.com/sprite.png' } }).imageUrl, 'https://example.com/sprite.png');
+    assert.equal(
+      mapPokemonDetailResponse({
+        ...base,
+        sprites: { front_default: 'https://example.com/sprite.png' },
+      }).imageUrl,
+      'https://example.com/sprite.png',
+    );
   });
 });

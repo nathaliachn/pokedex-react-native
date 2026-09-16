@@ -18,18 +18,14 @@ export type PokemonListViewState = {
   loadMore: () => void;
 };
 
-export function usePokemonList(
-  getPokemonList: GetPokemonList,
-): PokemonListViewState {
+export function usePokemonList(getPokemonList: GetPokemonList): PokemonListViewState {
   const [pokemon, setPokemon] = useState<Pokemon[]>([]);
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [paginationErrorMessage, setPaginationErrorMessage] = useState<
-    string | null
-  >(null);
+  const [paginationErrorMessage, setPaginationErrorMessage] = useState<string | null>(null);
   const [nextOffset, setNextOffset] = useState<number | null>(null);
   const [reloadToken, setReloadToken] = useState<number>(0);
   const [refreshToken, setRefreshToken] = useState<number>(0);
@@ -45,12 +41,7 @@ export function usePokemonList(
   }, []);
 
   const loadMore = useCallback(() => {
-    if (
-      isLoading ||
-      isLoadingMoreRef.current ||
-      errorMessage !== null ||
-      nextOffset === null
-    ) {
+    if (isLoading || isLoadingMoreRef.current || errorMessage !== null || nextOffset === null) {
       return;
     }
 
@@ -69,9 +60,7 @@ export function usePokemonList(
           return;
         }
 
-        setPokemon((currentPokemon) =>
-          appendUniquePokemon(currentPokemon, page.items),
-        );
+        setPokemon((currentPokemon) => appendUniquePokemon(currentPokemon, page.items));
         setNextOffset(page.nextOffset);
       } catch {
         if (isMountedRef.current) {
@@ -109,7 +98,7 @@ export function usePokemonList(
           return;
         }
 
-          setPokemon(page.items);
+        setPokemon(page.items);
         setTotalCount(page.totalCount);
         setNextOffset(page.nextOffset);
       } catch {
@@ -117,7 +106,7 @@ export function usePokemonList(
           return;
         }
 
-          if (!refreshing) setPokemon([]);
+        if (!refreshing) setPokemon([]);
         setNextOffset(null);
         setErrorMessage(APP_ERROR_MESSAGES.pokemonList);
       } finally {

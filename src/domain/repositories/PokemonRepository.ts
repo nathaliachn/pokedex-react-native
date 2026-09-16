@@ -6,6 +6,8 @@ export type PokemonListParams = {
   offset: number;
 };
 
+export type PokemonIdentifier = number | string;
+
 export type PokemonListPage = {
   items: Pokemon[];
   totalCount: number;
@@ -14,5 +16,5 @@ export type PokemonListPage = {
 
 export interface PokemonRepository {
   getList(params: PokemonListParams): Promise<PokemonListPage>;
-  getById(id: number): Promise<PokemonDetail>;
+  getById(identifier: PokemonIdentifier): Promise<PokemonDetail>;
 }

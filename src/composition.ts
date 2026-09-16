@@ -25,5 +25,4 @@ export function createPokemonUseCases(): {
 const pokemonUseCases = createPokemonUseCases();
 
 export const getPokemonList: GetPokemonList = pokemonUseCases.getPokemonList;
-export const getPokemonDetail: GetPokemonDetail =
-  pokemonUseCases.getPokemonDetail;
+export const getPokemonDetail: GetPokemonDetail = pokemonUseCases.getPokemonDetail;

@@ -25,11 +25,11 @@ export function Feedback({ message, loading = false, onRetry, retryLabel }: Feed
         <Pressable
           onPress={onRetry}
           accessibilityRole="button"
-          accessibilityLabel={retryLabel ?? 'Retry'}
+          accessibilityLabel={retryLabel ?? 'Reintentar'}
           android_ripple={{ color: '#ffffff33' }}
           style={({ pressed }) => [styles.button, pressed && styles.pressed]}
         >
-          <Text style={styles.buttonText}>Retry</Text>
+          <Text style={styles.buttonText}>Reintentar</Text>
         </Pressable>
       ) : null}
     </View>
@@ -41,8 +41,14 @@ const styles = StyleSheet.create({
   message: { alignItems: 'center', gap: 16 },
   text: { fontSize: 17, color: '#465568', textAlign: 'center' },
   button: {
-    backgroundColor: '#195e96', borderRadius: 12, minHeight: 48, minWidth: 112,
-    paddingHorizontal: 24, paddingVertical: 14, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#195e96',
+    borderRadius: 12,
+    minHeight: 48,
+    minWidth: 112,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   pressed: { backgroundColor: '#12466f' },
   buttonText: { color: '#fff', fontSize: 17, fontWeight: '600', textAlign: 'center' },

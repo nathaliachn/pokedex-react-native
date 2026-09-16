@@ -1,15 +1,12 @@
 import { PokemonDetail } from '../../domain/models/PokemonDetail';
 import { PokemonDetailResponseDto } from './pokemonDetailDto';
 
-const SPRITE_BASE_URL =
-  'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
+const SPRITE_BASE_URL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 
 const DECIMETRES_PER_METRE = 10;
 const HECTOGRAMS_PER_KILOGRAM = 10;
 
-export function mapPokemonDetailResponse(
-  response: PokemonDetailResponseDto,
-): PokemonDetail {
+export function mapPokemonDetailResponse(response: PokemonDetailResponseDto): PokemonDetail {
   const types = [...response.types]
     .sort((left, right) => left.slot - right.slot)
     .map((slot) => slot.type.name);

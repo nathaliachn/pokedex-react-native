@@ -11,14 +11,13 @@ export function filterPokemon(pokemon: Pokemon[], query: string): Pokemon[] {
     }
 
     const numericId = Number(normalizedQuery);
-    return Number.isSafeInteger(numericId)
-      ? pokemon.filter((item) => item.id === numericId)
-      : [];
+    return Number.isSafeInteger(numericId) ? pokemon.filter((item) => item.id === numericId) : [];
   }
 
-  return pokemon.filter((item) =>
-    item.name.toLowerCase().includes(normalizedQuery) ||
-    String(item.id).includes(normalizedQuery),
+  return pokemon.filter(
+    (item) =>
+      item.name.toLowerCase().includes(normalizedQuery) ||
+      String(item.id).includes(normalizedQuery),
   );
 }
 

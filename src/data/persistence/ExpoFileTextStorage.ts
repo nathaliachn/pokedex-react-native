@@ -15,9 +15,6 @@ export class ExpoFileTextStorage implements TextStorage {
 
   private file(key: string): File {
     // Resolve native paths lazily so storage errors stay inside request handling.
-    return new File(
-      new Directory(Paths.document, 'pokemon-v1'),
-      `${encodeURIComponent(key)}.json`,
-    );
+    return new File(new Directory(Paths.document, 'pokemon-v1'), `${encodeURIComponent(key)}.json`);
   }
 }

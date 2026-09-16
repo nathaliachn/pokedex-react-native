@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Image, ImageProps } from 'react-native';
 
 type PokemonArtworkProps = Omit<ImageProps, 'source'> & {
@@ -8,9 +8,9 @@ type PokemonArtworkProps = Omit<ImageProps, 'source'> & {
 
 export function PokemonArtwork({ primaryUri, fallbackUri, ...props }: PokemonArtworkProps) {
   const [useFallback, setUseFallback] = useState(false);
-  useEffect(() => setUseFallback(false), [primaryUri, fallbackUri]);
   return (
     <Image
+      key={primaryUri}
       {...props}
       source={{ uri: useFallback ? fallbackUri : primaryUri }}
       fadeDuration={0}
